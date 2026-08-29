@@ -20,8 +20,6 @@ jobs:
           - mcr.microsoft.com/devcontainers/base:ubuntu
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: "Install latest devcontainer CLI"
         run: npm install -g @devcontainers/cli
@@ -38,8 +36,6 @@ jobs:
           - pnpm
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: "Install latest devcontainer CLI"
         run: npm install -g @devcontainers/cli

@@ -3,15 +3,27 @@ set -e
 
 echo "Activating feature 'pnpm'"
 
-# The install script is vendored through the 'pnpm/get.pnpm.io' git submodule,
-# so no download of the script itself is needed at build time.
-FEATURE_DIR="$(cd "$(dirname "$0")" && pwd)"
-INSTALL_SCRIPT="$FEATURE_DIR/vendor/install.sh"
+# Download the official pnpm install script at build time. curl or wget are
+# provided by the common-utils feature (declared via installsAfter).
+INSTALL_SCRIPT_URL="https://get.pnpm.io/install.sh"
+INSTALL_SCRIPT="$(mktemp)"
 
-if [ ! -f "$INSTALL_SCRIPT" ]; then
-    echo "Error: could not find the pnpm install script at '$INSTALL_SCRIPT'." >&2
-    echo "The 'pnpm/get.pnpm.io' git submodule does not appear to be checked out." >&2
-    echo "Run 'git submodule update --init --recursive' to fetch it." >&2
+cleanup() {
+    rm -f "$INSTALL_SCRIPT"
+}
+trap cleanup EXIT INT TERM
+
+if command -v curl > /dev/null 2>&1; then
+    curl -fsSL "$INSTALL_SCRIPT_URL" -o "$INSTALL_SCRIPT"
+elif command -v wget > /dev/null 2>&1; then
+    wget -qO "$INSTALL_SCRIPT" "$INSTALL_SCRIPT_URL"
+else
+    echo "Error: the pnpm install script needs curl or wget to be downloaded." >&2
+    exit 1
+fi
+
+if [ ! -s "$INSTALL_SCRIPT" ]; then
+    echo "Error: failed to download the pnpm install script from '$INSTALL_SCRIPT_URL'." >&2
     exit 1
 fi
 
