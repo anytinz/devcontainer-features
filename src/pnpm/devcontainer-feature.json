@@ -20,6 +20,31 @@
             "type": "string",
             "default": "/usr/local/share/pnpm",
             "description": "Directory where pnpm is installed. Maps to the PNPM_HOME environment variable of the install script. The default is shared so that the binary stays accessible to every container user."
+        },
+        "installScriptUrl": {
+            "type": "string",
+            "default": "https://get.pnpm.io/install.sh",
+            "description": "URL of the pnpm install script to download at build time. Point this at an internal mirror of the script when the default URL is unreachable (e.g. for intranet users)."
+        },
+        "npmRegistryUrl": {
+            "type": "string",
+            "default": "",
+            "description": "npm registry used to download the pnpm binary. When set, the NPM_REGISTRY value inside the downloaded install script is rewritten with this URL before it runs. Useful with intranet mirrors such as https://registry.npmmirror.com."
+        },
+        "npmSigningKeyId": {
+            "type": "string",
+            "default": "",
+            "description": "The npm registry signing key ID the install script must find on downloaded packages. Override when your registry re-signs packages with its own key (e.g. a private Nexus repository): the NPM_SIGNING_KEY_ID value inside the downloaded install script is rewritten with it. Leave empty to keep the official npm registry key."
+        },
+        "npmSigningKey": {
+            "type": "string",
+            "default": "",
+            "description": "The base64 npm registry signing public key used to verify downloads. Override together with npmSigningKeyId when your registry signs packages with its own key: the NPM_SIGNING_KEY value inside the downloaded install script is rewritten with it. Leave empty to keep the official npm registry key."
+        },
+        "githubReleasesBaseUrl": {
+            "type": "string",
+            "default": "",
+            "description": "Base URL for downloading pnpm binaries from GitHub releases (used by the install script for pnpm < v12). When set, every occurrence of https://github.com/pnpm/pnpm/releases/download inside the downloaded install script is replaced with it, so binaries can be fetched through a GitHub proxy mirror. Trailing slashes are stripped automatically. Leave empty to keep the official GitHub URL."
         }
     },
     "dependsOn": {

@@ -10,7 +10,7 @@ This repository contains a _collection_ of one Feature - `pnpm`. Each sub-sectio
 
 ### `pnpm`
 
-Installs pnpm using the official install script from [pnpm/get.pnpm.io](https://github.com/pnpm/get.pnpm.io). The install script is vendored through a git submodule rather than downloaded with `curl` at build time. The `version` and `pnpmHome` options are forwarded to the script's `PNPM_VERSION` and `PNPM_HOME` environment variables.
+Installs pnpm using the official install script from [get.pnpm.io](https://get.pnpm.io/install.sh), downloaded with curl or wget at build time. The `version` and `pnpmHome` options are forwarded to the script's `PNPM_VERSION` and `PNPM_HOME` environment variables. For intranet users, `installScriptUrl` points at an internal mirror of the script, `npmRegistryUrl` rewrites the `NPM_REGISTRY` value inside it so the pnpm binary is fetched from an internal registry, `npmSigningKeyId`/`npmSigningKey` override the signing key when that registry re-signs packages with its own key, and `githubReleasesBaseUrl` replaces the GitHub releases download base (used for pnpm < v12) with a proxy mirror.
 
 ```jsonc
 {
@@ -37,12 +37,11 @@ Similar to the [`devcontainers/features`](https://github.com/devcontainers/featu
 ├── src
 │   ├── pnpm
 │   │   ├── devcontainer-feature.json
-│   │   ├── install.sh
-│   │   └── vendor            # git submodule: pnpm/get.pnpm.io
+│   │   └── install.sh
 ...
 ```
 
-The `pnpm` feature vendors the upstream install script via the `pnpm/get.pnpm.io` git submodule in `src/pnpm/vendor`. After cloning this repo, fetch it with `git submodule update --init --recursive`.
+The `pnpm` feature downloads the upstream install script from `https://get.pnpm.io/install.sh` with curl or wget during the container build.
 
 An [implementing tool](https://containers.dev/supporting#tools) will composite [the documented dev container properties](https://containers.dev/implementors/features/#devcontainer-feature-json-properties) from the feature's `devcontainer-feature.json` file, and execute in the `install.sh` entrypoint script in the container during build time.  Implementing tools are also free to process attributes under the `customizations` property as desired.
 
