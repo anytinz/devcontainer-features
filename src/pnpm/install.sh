@@ -4,8 +4,10 @@ set -e
 echo "Activating feature 'pnpm'"
 
 # Download the official pnpm install script at build time. curl or wget are
-# provided by the common-utils feature (declared via installsAfter).
-INSTALL_SCRIPT_URL="https://get.pnpm.io/install.sh"
+# provided by the common-utils feature (declared via installsAfter). The URL
+# can be overridden (e.g. with an internal mirror) via the installScriptUrl
+# option, which is passed in as the INSTALLSCRIPTURL environment variable.
+INSTALL_SCRIPT_URL="${INSTALLSCRIPTURL:-https://get.pnpm.io/install.sh}"
 INSTALL_SCRIPT="$(mktemp)"
 
 cleanup() {
@@ -26,6 +28,55 @@ if [ ! -s "$INSTALL_SCRIPT" ]; then
     echo "Error: failed to download the pnpm install script from '$INSTALL_SCRIPT_URL'." >&2
     exit 1
 fi
+
+# Rewrite variables baked into the install script before running it so
+# intranet users can point it at an internal registry. The official script
+# hardcodes NPM_REGISTRY, NPM_SIGNING_KEY_ID and NPM_SIGNING_KEY rather than
+# reading environment variables, so each is substituted in place. Set the
+# npmRegistryUrl, npmSigningKeyId and npmSigningKey options (NPMREGISTRYURL,
+# NPMSIGNINGKEYID, NPMSIGNINGKEY) to override them; base64 key material,
+# registry URLs and GitHub proxy URLs never contain the '|' delimiter used
+# below.
+# Strip trailing slashes so a user-provided base URL joins cleanly with the
+# '/<pkg>' and '/v${version}' suffixes the install script appends.
+normalize_base_url() {
+    printf '%s' "$1" | sed 's|/*$||'
+}
+
+rewrite_install_var() {
+    var="$1"
+    value="$2"
+    [ -n "$value" ] || return 0
+    sed -i "s|^$var=.*|$var=$value|" "$INSTALL_SCRIPT"
+    if ! sed -n "s|^$var=||p" "$INSTALL_SCRIPT" | grep -qxF "$value"; then
+        echo "Error: could not rewrite $var inside the install script from '$INSTALL_SCRIPT_URL'." >&2
+        exit 1
+    fi
+}
+
+rewrite_install_var NPM_REGISTRY "$(normalize_base_url "${NPMREGISTRYURL:-}")"
+rewrite_install_var NPM_SIGNING_KEY_ID "${NPMSIGNINGKEYID:-}"
+rewrite_install_var NPM_SIGNING_KEY "${NPMSIGNINGKEY:-}"
+
+# The GitHub releases download base is inlined into 'download' calls (pnpm <
+# v12 is distributed from GitHub rather than the registry), so rewrite every
+# occurrence as a substring instead of a whole assignment.
+GITHUB_RELEASES_BASE="https://github.com/pnpm/pnpm/releases/download"
+rewrite_download_base() {
+    value="$1"
+    [ -n "$value" ] || return 0
+    if ! grep -qF "$GITHUB_RELEASES_BASE" "$INSTALL_SCRIPT"; then
+        echo "Error: could not find '$GITHUB_RELEASES_BASE' inside the install script from '$INSTALL_SCRIPT_URL'." >&2
+        exit 1
+    fi
+    sed -i "s|$GITHUB_RELEASES_BASE|$value|g" "$INSTALL_SCRIPT"
+    if ! grep -qF "$value" "$INSTALL_SCRIPT"; then
+        echo "Error: could not rewrite '$GITHUB_RELEASES_BASE' inside the install script from '$INSTALL_SCRIPT_URL'." >&2
+        exit 1
+    fi
+}
+
+rewrite_download_base "$(normalize_base_url "${GITHUBRELEASESBASEURL:-}")"
 
 # The install script needs curl or wget to download pnpm. Both are provided
 # by the common-utils feature, so only libatomic is handled here: pnpm's v11

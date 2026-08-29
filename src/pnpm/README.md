@@ -1,7 +1,7 @@
 
 # pnpm (pnpm)
 
-Installs pnpm using the official install script from [get.pnpm.io](https://get.pnpm.io/install.sh), downloaded with curl or wget at build time.
+Installs pnpm using the official install script from [get.pnpm.io](https://get.pnpm.io/install.sh), downloaded with curl or wget at build time. For intranet users, the `installScriptUrl` option points at an internal mirror of the script, `npmRegistryUrl` rewrites the `NPM_REGISTRY` value inside it so the pnpm binary is fetched from an internal registry, `npmSigningKeyId`/`npmSigningKey` override the signing key when that registry re-signs packages with its own key, and `githubReleasesBaseUrl` replaces the GitHub releases download base (used for pnpm < v12) with a proxy mirror.
 
 This feature requires [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils) to be installed beforehand (declared via `installsAfter`) because the pnpm install script needs `curl` or `wget` plus `ca-certificates` to download and verify pnpm.
 
