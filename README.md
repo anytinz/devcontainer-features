@@ -10,7 +10,7 @@ This repository contains a _collection_ of one Feature - `pnpm`. Each sub-sectio
 
 ### `pnpm`
 
-Installs pnpm using the official install script from [get.pnpm.io](https://get.pnpm.io/install.sh), downloaded with curl or wget at build time. The `version` and `pnpmHome` options are forwarded to the script's `PNPM_VERSION` and `PNPM_HOME` environment variables.
+Installs pnpm using the official install script from [get.pnpm.io](https://get.pnpm.io/install.sh), downloaded with curl or wget at build time. The `version` and `pnpmHome` options are forwarded to the script's `PNPM_VERSION` and `PNPM_HOME` environment variables. For intranet users, `installScriptUrl` points at an internal mirror of the script, `npmRegistryUrl` rewrites the `NPM_REGISTRY` value inside it so the pnpm binary is fetched from an internal registry, `npmSigningKeyId`/`npmSigningKey` override the signing key when that registry re-signs packages with its own key, and `githubReleasesBaseUrl` replaces the GitHub releases download base (used for pnpm < v12) with a proxy mirror.
 
 ```jsonc
 {
