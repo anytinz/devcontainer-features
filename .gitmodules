@@ -1,0 +1,3 @@
+[submodule "src/pnpm/vendor"]
+	path = src/pnpm/vendor
+	url = https://github.com/pnpm/get.pnpm.io.git

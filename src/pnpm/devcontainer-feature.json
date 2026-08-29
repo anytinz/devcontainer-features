@@ -1,0 +1,28 @@
+{
+    "name": "pnpm",
+    "id": "pnpm",
+    "version": "1.0.0",
+    "description": "Installs pnpm using the official install script from pnpm/get.pnpm.io",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "next",
+                "10",
+                "11",
+                "12"
+            ],
+            "default": "latest",
+            "description": "Version of pnpm to install. Accepts a full version (e.g. 11.24.0), a bare major (e.g. 11), or a dist-tag (e.g. latest, next-12). Maps to the PNPM_VERSION environment variable of the install script."
+        },
+        "pnpmHome": {
+            "type": "string",
+            "default": "/usr/local/share/pnpm",
+            "description": "Directory where pnpm is installed. Maps to the PNPM_HOME environment variable of the install script. The default is shared so that the binary stays accessible to every container user."
+        }
+    },
+    "dependsOn": {
+        "ghcr.io/devcontainers/features/common-utils:2": {}
+    }
+}

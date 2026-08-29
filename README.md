@@ -6,7 +6,7 @@
 
 ## Example Contents
 
-This repository contains a _collection_ of two Features - `hello` and `color`. These Features serve as simple feature implementations.  Each sub-section below shows a sample `devcontainer.json` alongside example usage of the Feature.
+This repository contains a _collection_ of three Features - `hello`, `color` and `pnpm`. These Features serve as simple feature implementations.  Each sub-section below shows a sample `devcontainer.json` alongside example usage of the Feature.
 
 ### `hello`
 
@@ -50,6 +50,27 @@ $ color
 my favorite color is green
 ```
 
+### `pnpm`
+
+Installs pnpm using the official install script from [pnpm/get.pnpm.io](https://github.com/pnpm/get.pnpm.io). The install script is vendored through a git submodule rather than downloaded with `curl` at build time. The `version` and `pnpmHome` options are forwarded to the script's `PNPM_VERSION` and `PNPM_HOME` environment variables.
+
+```jsonc
+{
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+        "ghcr.io/devcontainers/feature-starter/pnpm:1": {
+            "version": "11"
+        }
+    }
+}
+```
+
+```bash
+$ pnpm --version
+
+11.24.0
+```
+
 ## Repo and Feature Structure
 
 Similar to the [`devcontainers/features`](https://github.com/devcontainers/features) repo, this repository has a `src` folder.  Each Feature has its own sub-folder, containing at least a `devcontainer-feature.json` and an entrypoint script `install.sh`. 
@@ -62,11 +83,17 @@ Similar to the [`devcontainers/features`](https://github.com/devcontainers/featu
 │   ├── color
 │   │   ├── devcontainer-feature.json
 │   │   └── install.sh
+│   ├── pnpm
+│   │   ├── devcontainer-feature.json
+│   │   ├── install.sh
+│   │   └── vendor            # git submodule: pnpm/get.pnpm.io
 |   ├── ...
 │   │   ├── devcontainer-feature.json
 │   │   └── install.sh
 ...
 ```
+
+The `pnpm` feature vendors the upstream install script via the `pnpm/get.pnpm.io` git submodule in `src/pnpm/vendor`. After cloning this repo, fetch it with `git submodule update --init --recursive`.
 
 An [implementing tool](https://containers.dev/supporting#tools) will composite [the documented dev container properties](https://containers.dev/implementors/features/#devcontainer-feature-json-properties) from the feature's `devcontainer-feature.json` file, and execute in the `install.sh` entrypoint script in the container during build time.  Implementing tools are also free to process attributes under the `customizations` property as desired.
 
@@ -123,7 +150,7 @@ This repo contains a **GitHub Action** [workflow](.github/workflows/release.yaml
 
 *Allow GitHub Actions to create and approve pull requests* should be enabled in the repository's `Settings > Actions > General > Workflow permissions` for auto generation of `src/<feature>/README.md` per Feature (which merges any existing `src/<feature>/NOTES.md`).
 
-By default, each Feature will be prefixed with the `<owner/<repo>` namespace.  For example, the two Features in this repository can be referenced in a `devcontainer.json` with:
+By default, each Feature will be prefixed with the `<owner/<repo>` namespace.  For example, the three Features in this repository can be referenced in a `devcontainer.json` with:
 
 ```
 ghcr.io/devcontainers/feature-starter/color:1
