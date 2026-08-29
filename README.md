@@ -1,54 +1,12 @@
-# Dev Container Features: Self Authoring Template
+# Dev Container Features
 
-> This repo provides a starting point and example for creating your own custom [dev container Features](https://containers.dev/implementors/features/), hosted for free on GitHub Container Registry.  The example in this repository follows the [dev container Feature distribution specification](https://containers.dev/implementors/features-distribution/).  
+> This repo provides dev container [Features](https://containers.dev/implementors/features/), hosted for free on GitHub Container Registry.  The Features in this repository follow the [dev container Feature distribution specification](https://containers.dev/implementors/features-distribution/).
 >
 > To provide feedback to the specification, please leave a comment [on spec issue #70](https://github.com/devcontainers/spec/issues/70). For more broad feedback regarding dev container Features, please see [spec issue #61](https://github.com/devcontainers/spec/issues/61).
 
-## Example Contents
+## Features
 
-This repository contains a _collection_ of three Features - `hello`, `color` and `pnpm`. These Features serve as simple feature implementations.  Each sub-section below shows a sample `devcontainer.json` alongside example usage of the Feature.
-
-### `hello`
-
-Running `hello` inside the built container will print the greeting provided to it via its `greeting` option.
-
-```jsonc
-{
-    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-    "features": {
-        "ghcr.io/devcontainers/feature-starter/hello:1": {
-            "greeting": "Hello"
-        }
-    }
-}
-```
-
-```bash
-$ hello
-
-Hello, user.
-```
-
-### `color`
-
-Running `color` inside the built container will print your favorite color to standard out.
-
-```jsonc
-{
-    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-    "features": {
-        "ghcr.io/devcontainers/feature-starter/color:1": {
-            "favorite": "green"
-        }
-    }
-}
-```
-
-```bash
-$ color
-
-my favorite color is green
-```
+This repository contains a _collection_ of one Feature - `pnpm`. Each sub-section below shows a sample `devcontainer.json` alongside example usage of the Feature.
 
 ### `pnpm`
 
@@ -58,7 +16,7 @@ Installs pnpm using the official install script from [pnpm/get.pnpm.io](https://
 {
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "features": {
-        "ghcr.io/devcontainers/feature-starter/pnpm:1": {
+        "ghcr.io/anytinz/devcontainers-features/pnpm:1": {
             "version": "11"
         }
     }
@@ -73,23 +31,14 @@ $ pnpm --version
 
 ## Repo and Feature Structure
 
-Similar to the [`devcontainers/features`](https://github.com/devcontainers/features) repo, this repository has a `src` folder.  Each Feature has its own sub-folder, containing at least a `devcontainer-feature.json` and an entrypoint script `install.sh`. 
+Similar to the [`devcontainers/features`](https://github.com/devcontainers/features) repo, this repository has a `src` folder.  Each Feature has its own sub-folder, containing at least a `devcontainer-feature.json` and an entrypoint script `install.sh`.
 
 ```
 ├── src
-│   ├── hello
-│   │   ├── devcontainer-feature.json
-│   │   └── install.sh
-│   ├── color
-│   │   ├── devcontainer-feature.json
-│   │   └── install.sh
 │   ├── pnpm
 │   │   ├── devcontainer-feature.json
 │   │   ├── install.sh
 │   │   └── vendor            # git submodule: pnpm/get.pnpm.io
-|   ├── ...
-│   │   ├── devcontainer-feature.json
-│   │   └── install.sh
 ...
 ```
 
@@ -101,21 +50,23 @@ An [implementing tool](https://containers.dev/supporting#tools) will composite [
 
 All available options for a Feature should be declared in the `devcontainer-feature.json`.  The syntax for the `options` property can be found in the [devcontainer Feature json properties reference](https://containers.dev/implementors/features/#devcontainer-feature-json-properties).
 
-For example, the `color` feature provides an enum of three possible options (`red`, `gold`, `green`).  If no option is provided in a user's `devcontainer.json`, the value is set to "red".
+For example, the `pnpm` feature provides a `version` option with a set of proposals (`latest`, `next`, `10`, `11`, `12`).  If no option is provided in a user's `devcontainer.json`, the value is set to "latest".
 
 ```jsonc
 {
     // ...
     "options": {
-        "favorite": {
+        "version": {
             "type": "string",
-            "enum": [
-                "red",
-                "gold",
-                "green"
+            "proposals": [
+                "latest",
+                "next",
+                "10",
+                "11",
+                "12"
             ],
-            "default": "red",
-            "description": "Choose your favorite color."
+            "default": "latest",
+            "description": "Version of pnpm to install. Accepts a full version (e.g. 11.24.0), a bare major (e.g. 11), or a dist-tag (e.g. latest, next-12). Maps to the PNPM_VERSION environment variable of the install script."
         }
     }
 }
@@ -124,10 +75,12 @@ For example, the `color` feature provides an enum of three possible options (`re
 Options are exported as Feature-scoped environment variables.  The option name is captialized and sanitized according to [option resolution](https://containers.dev/implementors/features/#option-resolution).
 
 ```bash
-#!/bin/bash
+#!/bin/sh
 
-echo "Activating feature 'color'"
-echo "The provided favorite color is: ${FAVORITE}"
+echo "Activating feature 'pnpm'"
+
+# Forward the feature options to the install script's environment variables.
+export PNPM_VERSION="${VERSION:-latest}"
 
 ...
 ```
@@ -140,26 +93,25 @@ Features are individually versioned by the `version` attribute in a Feature's `d
 
 ### Publishing
 
-> NOTE: The Distribution spec can be [found here](https://containers.dev/implementors/features-distribution/).  
+> NOTE: The Distribution spec can be [found here](https://containers.dev/implementors/features-distribution/).
 >
 > While any registry [implementing the OCI Distribution spec](https://github.com/opencontainers/distribution-spec) can be used, this template will leverage GHCR (GitHub Container Registry) as the backing registry.
 
-Features are meant to be easily sharable units of dev container configuration and installation code.  
+Features are meant to be easily sharable units of dev container configuration and installation code.
 
-This repo contains a **GitHub Action** [workflow](.github/workflows/release.yaml) that will publish each Feature to GHCR. 
+This repo contains a **GitHub Action** [workflow](.github/workflows/release.yaml) that will publish each Feature to GHCR.
 
 *Allow GitHub Actions to create and approve pull requests* should be enabled in the repository's `Settings > Actions > General > Workflow permissions` for auto generation of `src/<feature>/README.md` per Feature (which merges any existing `src/<feature>/NOTES.md`).
 
-By default, each Feature will be prefixed with the `<owner/<repo>` namespace.  For example, the three Features in this repository can be referenced in a `devcontainer.json` with:
+By default, each Feature will be prefixed with the `<owner/<repo>` namespace.  For example, the Feature in this repository can be referenced in a `devcontainer.json` with:
 
 ```
-ghcr.io/devcontainers/feature-starter/color:1
-ghcr.io/devcontainers/feature-starter/hello:1
+ghcr.io/anytinz/devcontainers-features/pnpm:1
 ```
 
-The provided GitHub Action will also publish a third "metadata" package with just the namespace, eg: `ghcr.io/devcontainers/feature-starter`.  This contains information useful for tools aiding in Feature discovery.
+The provided GitHub Action will also publish a second "metadata" package with just the namespace, eg: `ghcr.io/anytinz/devcontainers-features`.  This contains information useful for tools aiding in Feature discovery.
 
-'`devcontainers/feature-starter`' is known as the feature collection namespace.
+'`anytinz/devcontainers-features`' is known as the feature collection namespace.
 
 ### Marking Feature Public
 
@@ -195,8 +147,8 @@ An example `devcontainer.json` can be found below.
 {
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "features": {
-     "ghcr.io/my-org/private-features/hello:1": {
-            "greeting": "Hello"
+     "ghcr.io/my-org/private-features/pnpm:1": {
+            "version": "11"
         }
     },
     "customizations": {
