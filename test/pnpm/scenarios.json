@@ -1,0 +1,18 @@
+{
+    "specific_version": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "pnpm": {
+                "version": "11"
+            }
+        }
+    },
+    "custom_pnpm_home": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "pnpm": {
+                "pnpmHome": "/usr/local/share/pnpm"
+            }
+        }
+    }
+}
