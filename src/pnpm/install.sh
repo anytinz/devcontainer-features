@@ -7,7 +7,7 @@ echo "Activating feature 'pnpm'"
 # provided by the common-utils feature (declared via installsAfter). The URL
 # can be overridden (e.g. with an internal mirror) via the installScriptUrl
 # option, which is passed in as the INSTALLSCRIPTURL environment variable.
-INSTALL_SCRIPT_URL="${INSTALLSCRIPTURL:-https://get.pnpm.io/install.sh}"
+INSTALL_SCRIPT_URL="${INSTALLSCRIPTURL:-https://raw.githubusercontent.com/pnpm/get.pnpm.io/8c3b5ae1418539249807dd8f99a78ccea8a4c14a/install.sh}"
 INSTALL_SCRIPT="$(mktemp)"
 
 cleanup() {

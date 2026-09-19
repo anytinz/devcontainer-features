@@ -1,7 +1,7 @@
 {
     "name": "pnpm",
     "id": "pnpm",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Installs pnpm using the official install script from pnpm/get.pnpm.io",
     "options": {
         "version": {
@@ -23,7 +23,7 @@
         },
         "installScriptUrl": {
             "type": "string",
-            "default": "https://get.pnpm.io/install.sh",
+            "default": "https://raw.githubusercontent.com/pnpm/get.pnpm.io/8c3b5ae1418539249807dd8f99a78ccea8a4c14a/install.sh",
             "description": "URL of the pnpm install script to download at build time. Point this at an internal mirror of the script when the default URL is unreachable (e.g. for intranet users)."
         },
         "npmRegistryUrl": {
