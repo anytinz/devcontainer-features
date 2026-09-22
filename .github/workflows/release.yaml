@@ -12,6 +12,11 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Keep only the vendored pnpm installer
+        run: git -C src/pnpm/vendor sparse-checkout set --no-cone /install.sh
 
       - name: "Publish Features"
         uses: devcontainers/action@v1

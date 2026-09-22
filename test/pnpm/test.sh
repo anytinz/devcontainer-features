@@ -7,7 +7,8 @@
 #
 # Thus, the value of all options will fall back to the default value in
 # the Feature's 'devcontainer-feature.json'.
-# For the 'pnpm' feature, that means version 'latest' installed to '~/.pnpm'.
+# For the 'pnpm' feature, that means version 'latest' installed to
+# '/usr/local/share/pnpm' using the vendored installer.
 #
 # These scripts are run as 'root' by default. Although that can be changed
 # with the '--remote-user' flag.

@@ -10,13 +10,13 @@ This repository contains a _collection_ of one Feature - `pnpm`. Each sub-sectio
 
 ### `pnpm`
 
-Installs pnpm using the official install script from [get.pnpm.io](https://get.pnpm.io/install.sh), downloaded with curl or wget at build time. The `version` and `pnpmHome` options are forwarded to the script's `PNPM_VERSION` and `PNPM_HOME` environment variables. For intranet users, `installScriptUrl` points at an internal mirror of the script, `npmRegistryUrl` rewrites the `NPM_REGISTRY` value inside it so the pnpm binary is fetched from an internal registry, `npmSigningKeyId`/`npmSigningKey` override the signing key when that registry re-signs packages with its own key, and `githubReleasesBaseUrl` replaces the GitHub releases download base (used for pnpm < v12) with a proxy mirror.
+Installs pnpm using the official [get.pnpm.io](https://github.com/pnpm/get.pnpm.io) install script pinned in `src/pnpm/vendor`. The `version` and `pnpmHome` options are forwarded to the script's `PNPM_VERSION` and `PNPM_HOME` environment variables. For intranet users, `npmRegistryUrl` rewrites the `NPM_REGISTRY` value inside it so the pnpm binary is fetched from an internal registry, `npmSigningKeyId`/`npmSigningKey` override the signing key when that registry re-signs packages with its own key, and `githubReleasesBaseUrl` replaces the GitHub releases download base (used for pnpm < v12) with a proxy mirror. Version 2 removes `installScriptUrl`; the installer itself is included in the published Feature.
 
 ```jsonc
 {
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "features": {
-        "ghcr.io/anytinz/devcontainers-features/pnpm:1": {
+        "ghcr.io/anytinz/devcontainer-features/pnpm:2": {
             "version": "11"
         }
     }
@@ -37,11 +37,12 @@ Similar to the [`devcontainers/features`](https://github.com/devcontainers/featu
 ├── src
 │   ├── pnpm
 │   │   ├── devcontainer-feature.json
-│   │   └── install.sh
+│   │   ├── install.sh
+│   │   └── vendor/                 # pnpm/get.pnpm.io Git submodule
 ...
 ```
 
-The `pnpm` feature downloads the upstream install script from `https://get.pnpm.io/install.sh` with curl or wget during the container build.
+The `pnpm` feature uses the pinned `vendor/install.sh` from its Git submodule. Clone this repository with `git clone --recurse-submodules`, or run `git submodule update --init --recursive` before testing or publishing. The CI workflows use a sparse checkout so only `install.sh` is included in published packages. Container builds still fetch the pnpm binary from the configured registry or releases mirror.
 
 An [implementing tool](https://containers.dev/supporting#tools) will composite [the documented dev container properties](https://containers.dev/implementors/features/#devcontainer-feature-json-properties) from the feature's `devcontainer-feature.json` file, and execute in the `install.sh` entrypoint script in the container during build time.  Implementing tools are also free to process attributes under the `customizations` property as desired.
 
@@ -105,10 +106,10 @@ This repo contains a **GitHub Action** [workflow](.github/workflows/release.yaml
 By default, each Feature will be prefixed with the `<owner/<repo>` namespace.  For example, the Feature in this repository can be referenced in a `devcontainer.json` with:
 
 ```
-ghcr.io/anytinz/devcontainers-features/pnpm:1
+ghcr.io/anytinz/devcontainer-features/pnpm:2
 ```
 
-The provided GitHub Action will also publish a second "metadata" package with just the namespace, eg: `ghcr.io/anytinz/devcontainers-features`.  This contains information useful for tools aiding in Feature discovery.
+The provided GitHub Action will also publish a second "metadata" package with just the namespace, eg: `ghcr.io/anytinz/devcontainer-features`.  This contains information useful for tools aiding in Feature discovery.
 
 '`anytinz/devcontainers-features`' is known as the feature collection namespace.
 
